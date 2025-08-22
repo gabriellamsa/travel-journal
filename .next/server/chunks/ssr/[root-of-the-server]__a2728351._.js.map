@@ -3,5 +3,5 @@
   "sources": [],
   "sections": [
     {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
-    {"offset": {"line": 11, "column": 0}, "map": {"version":3,"sources":["file:///Users/gabi/Documents/FRONTEND/travel-journal/src/app/page.tsx"],"sourcesContent":["export default function Home() {\n  return <main className=\"flex-1\"></main>;\n}\n"],"names":[],"mappings":";;;;;;AAAe,SAAS;IACtB,qBAAO,8OAAC;QAAK,WAAU;;;;;;AACzB","debugId":null}}]
+    {"offset": {"line": 11, "column": 0}, "map": {"version":3,"sources":["file:///Users/gabi/Documents/FRONTEND/travel-journal/src/app/page.tsx"],"sourcesContent":["export default function Home() {\n  return (\n    <main className=\"flex-1\">\n      <section>\n        {/* Home components */}\n      </section>\n    </main>\n  );\n}\n"],"names":[],"mappings":";;;;;;AAAe,SAAS;IACtB,qBACE,8OAAC;QAAK,WAAU;kBACd,cAAA,8OAAC;;;;;;;;;;AAKP","debugId":null}}]
 }

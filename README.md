@@ -8,19 +8,21 @@ This project is currently under construction. Follow the journey! 🚀
 ## ✨ About the Project
 
 ## The Travel Journal is a platform where travelers can:
-	•	Create personalized trips
-	•	Add photos, notes, and visited places
-	•	View routes on interactive maps
-	•	Share experiences publicly like a mini-blog
+
+    •	Create personalized trips
+    •	Add photos, notes, and visited places
+    •	View routes on interactive maps
+    •	Share experiences publicly like a mini-blog
 
 ⸻
 
 ## ⚙️ Technologies
-	•	Next.js — React framework
-	•	TypeScript — Static typing
-	•	Tailwind CSS — Responsive styling
-	•	Supabase — Database and authentication
-	•	Mapbox — Interactive maps
+
+    •	Next.js — React framework
+    •	TypeScript — Static typing
+    •	Tailwind CSS — Responsive styling
+    •	Supabase — Database and authentication
+    •	Mapbox — Interactive maps
 
 ⸻
 
