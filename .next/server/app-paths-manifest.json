@@ -1,4 +1,5 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/about/page": "app/about/page.js",
   "/footer/cookies/page": "app/footer/cookies/page.js",
   "/footer/privacy/page": "app/footer/privacy/page.js",
