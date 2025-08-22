@@ -17,7 +17,7 @@ export default function AuthCallback() {
       } = await supabase.auth.getSession();
 
       if (session) {
-        router.push("/"); // redireciona para home após confirmação (atualizar para dashboard após criar)
+        router.push("/dashboard"); // redireciona para dashboard após confirmação
       } else if (error) {
         router.push("/login");
       }

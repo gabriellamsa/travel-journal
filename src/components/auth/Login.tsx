@@ -28,7 +28,7 @@ export default function Login() {
       if (error) throw error;
 
       setMessage("Login successful! Redirecting...");
-      router.push("/"); // redireciona para home após login (atualizar para dashboard após criar)
+      router.push("/dashboard"); // redireciona para dashboard após login
     } catch (error: any) {
       setMessage(
         error.message || "Invalid email or password. Please try again."
