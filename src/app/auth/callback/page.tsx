@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { upsertProfile } from "@/lib/profiles";
 import Navbar from "@/components/nav/Navbar";
 import Footer from "@/components/footer/Footer";
 
@@ -17,7 +18,19 @@ export default function AuthCallback() {
       } = await supabase.auth.getSession();
 
       if (session) {
-        router.push("/dashboard"); // redireciona para dashboard após confirmação
+        // create or update user profile
+        try {
+          await upsertProfile(session.user.id, {
+            full_name: "",
+            bio: "",
+            avatar_url: "",
+          });
+        } catch (profileError) {
+          console.error("Error creating profile:", profileError);
+          // continue to dashboard even if profile creation fails
+        }
+
+        router.push("/dashboard"); // redirect to dashboard after confirmation
       } else if (error) {
         router.push("/login");
       }

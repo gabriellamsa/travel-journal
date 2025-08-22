@@ -3,19 +3,20 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { User } from "@/lib/types";
+import { useProfile } from "@/lib/hooks/useProfile";
 import Navbar from "@/components/nav/Navbar";
 import Footer from "@/components/footer/Footer";
-
-interface User {
-  id: string;
-  email: string;
-  created_at: string;
-}
+import ProfileDisplay from "@/components/profile/ProfileDisplay";
+import ProfileEdit from "@/components/profile/ProfileEdit";
 
 export default function Dashboard() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+
+  const { profile, updateProfile } = useProfile(user?.id);
 
   useEffect(() => {
     // check if user is authenticated
@@ -31,11 +32,13 @@ export default function Dashboard() {
           return;
         }
 
-        setUser({
+        const userData = {
           id: session.user.id,
           email: session.user.email!,
           created_at: session.user.created_at,
-        });
+        };
+
+        setUser(userData);
       } catch (error) {
         console.error("Error checking user session:", error);
         router.push("/login");
@@ -73,30 +76,35 @@ export default function Dashboard() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
             <p className="mt-2 text-gray-600">
-              Welcome to your Travel Journal, {user?.email}
+              Welcome to your Travel Journal,{" "}
+              {profile?.full_name || user?.email}
             </p>
           </div>
 
-          {/* user info card */}
-          <div className="mb-8 rounded-lg bg-white p-6 shadow-sm border border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Account Information
-            </h2>
-            <div className="space-y-3">
-              <div>
-                <span className="font-medium text-gray-700">Email:</span>
-                <span className="ml-2 text-gray-900">{user?.email}</span>
-              </div>
-              <div>
-                <span className="font-medium text-gray-700">Member since:</span>
-                <span className="ml-2 text-gray-900">
-                  {user?.created_at
-                    ? new Date(user.created_at).toLocaleDateString("en-US")
-                    : "N/A"}
-                </span>
-              </div>
+          {/* profile section */}
+          {profile && (
+            <div className="mb-8">
+              {isEditingProfile ? (
+                <ProfileEdit
+                  profile={profile}
+                  onProfileUpdate={async (updatedProfile) => {
+                    await updateProfile({
+                      full_name: updatedProfile.full_name || undefined,
+                      bio: updatedProfile.bio || undefined,
+                      avatar_url: updatedProfile.avatar_url || undefined,
+                    });
+                    setIsEditingProfile(false);
+                  }}
+                  onCancel={() => setIsEditingProfile(false)}
+                />
+              ) : (
+                <ProfileDisplay
+                  profile={profile}
+                  onEdit={() => setIsEditingProfile(true)}
+                />
+              )}
             </div>
-          </div>
+          )}
 
           {/* quick actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
