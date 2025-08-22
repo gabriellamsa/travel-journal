@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <header className="sticky top-0 z-50 border-b border-black/10 bg-background/80 backdrop-blur-md">
@@ -21,25 +24,31 @@ export default function Navbar() {
         <nav className="hidden items-center gap-4 md:flex" aria-label="Primary">
           <Link
             href="/"
-            className="text-foreground/90 no-underline hover:opacity-100 opacity-90 transition-opacity"
+            className={`text-foreground/90 no-underline transition-all duration-200 hover:font-semibold hover:brightness-110 ${
+              pathname === "/" ? "font-semibold" : ""
+            }`}
           >
             Home
           </Link>
           <Link
             href="/about"
-            className="text-foreground/90 no-underline hover:opacity-100 opacity-90 transition-opacity"
+            className={`text-foreground/90 no-underline transition-all duration-200 hover:font-semibold hover:brightness-110 ${
+              pathname === "/about" ? "font-semibold" : ""
+            }`}
           >
             About
           </Link>
           <Link
             href="/trips"
-            className="text-foreground/90 no-underline hover:opacity-100 opacity-90 transition-opacity"
+            className={`text-foreground/90 no-underline transition-all duration-200 hover:font-semibold hover:brightness-110 ${
+              pathname === "/trips" ? "font-semibold" : ""
+            }`}
           >
             Trips
           </Link>
           <Link
             href="/create"
-            className="rounded-lg bg-foreground px-3 py-2 font-semibold text-background no-underline"
+            className="rounded-lg bg-foreground px-3 py-2 font-semibold text-background no-underline transition-all duration-200 hover:brightness-110"
           >
             Create Trip
           </Link>
@@ -52,9 +61,11 @@ export default function Navbar() {
           onClick={() => setIsMenuOpen((v) => !v)}
           className="inline-flex flex-col gap-1.5 rounded-lg border border-black/10 p-2 md:hidden"
         >
-          <span className="block h-0.5 w-4 rounded bg-foreground" />
-          <span className="block h-0.5 w-4 rounded bg-foreground" />
-          <span className="block h-0.5 w-4 rounded bg-foreground" />
+          {isMenuOpen ? (
+            <X className="h-5 w-5 text-foreground" />
+          ) : (
+            <Menu className="h-5 w-5 text-foreground" />
+          )}
         </button>
       </div>
 
@@ -65,28 +76,28 @@ export default function Navbar() {
         >
           <Link
             href="/"
-            className="py-2 no-underline text-foreground"
+            className="py-2 no-underline text-foreground transition-all duration-200 hover:font-semibold hover:brightness-110"
             onClick={() => setIsMenuOpen(false)}
           >
             Home
           </Link>
           <Link
             href="/about"
-            className="py-2 no-underline text-foreground"
+            className="py-2 no-underline text-foreground transition-all duration-200 hover:font-semibold hover:brightness-110"
             onClick={() => setIsMenuOpen(false)}
           >
             About
           </Link>
           <Link
             href="/trips"
-            className="py-2 no-underline text-foreground"
+            className="py-2 no-underline text-foreground transition-all duration-200 hover:font-semibold hover:brightness-110"
             onClick={() => setIsMenuOpen(false)}
           >
             Trips
           </Link>
           <Link
             href="/create"
-            className="mt-1 inline-block w-fit rounded-lg bg-foreground px-3 py-2 font-semibold text-background no-underline"
+            className="mt-1 inline-block w-fit rounded-lg bg-foreground px-3 py-2 font-semibold text-background no-underline transition-all duration-200 hover:brightness-110"
             onClick={() => setIsMenuOpen(false)}
           >
             Create Trip
