@@ -38,7 +38,7 @@ const STEPS: Step[] = [
 
 export default function HowItWorks() {
   return (
-    <section className="mx-auto max-w-6xl px-5 pb-24">
+    <section className="mx-auto max-w-6xl px-5 pt-18 pb-24 border-t border-gray-200">
       <div className="mx-auto mb-12 max-w-3xl text-center">
         <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
           How it works
@@ -61,8 +61,10 @@ export default function HowItWorks() {
                 </span>
                 Step {step.id}
               </div>
-              <h3 className="text-lg font-semibold md:text-xl">{step.title}</h3>
-              <p className="mt-2 max-w-prose text-sm text-gray-600 md:text-base">
+              <h3 className="text-lg font-semibold tracking-tight md:text-xl">
+                {step.title}
+              </h3>
+              <p className="mt-2 max-w-prose text-sm leading-relaxed text-gray-600 md:text-base">
                 {step.description}
               </p>
               <ul className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-700">
@@ -77,14 +79,15 @@ export default function HowItWorks() {
               </ul>
             </div>
             <div className={step.id === 2 ? "order-2 md:order-1" : "order-2"}>
-              <div className="relative overflow-hidden rounded-2xl border border-black/10 bg-white shadow-md">
+              <div className="group relative overflow-hidden rounded-2xl border border-black/10 bg-white shadow-md transition-shadow hover:shadow-lg">
+                <div className="pointer-events-none absolute inset-0 opacity-70 [mask-image:linear-gradient(to_bottom,black_60%,transparent)]" />
                 <div className="relative aspect-[16/10] w-full">
                   <Image
                     src={step.image}
                     alt={step.title}
                     fill
                     sizes="(min-width: 1024px) 45vw, (min-width: 768px) 50vw, 100vw"
-                    className="object-cover"
+                    className="object-cover transition-transform duration-300 will-change-transform group-hover:scale-[1.02]"
                   />
                 </div>
               </div>
