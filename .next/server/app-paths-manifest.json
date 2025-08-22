@@ -1,8 +1,7 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
+  "/about/page": "app/about/page.js",
   "/footer/cookies/page": "app/footer/cookies/page.js",
   "/footer/privacy/page": "app/footer/privacy/page.js",
   "/footer/terms/page": "app/footer/terms/page.js",
-  "/page": "app/page.js",
-  "/privacy/page": "app/privacy/page.js"
+  "/page": "app/page.js"
 }

@@ -26,6 +26,12 @@ export default function Navbar() {
             Home
           </Link>
           <Link
+            href="/about"
+            className="text-foreground/90 no-underline hover:opacity-100 opacity-90 transition-opacity"
+          >
+            About
+          </Link>
+          <Link
             href="/trips"
             className="text-foreground/90 no-underline hover:opacity-100 opacity-90 transition-opacity"
           >
@@ -63,6 +69,13 @@ export default function Navbar() {
             onClick={() => setIsMenuOpen(false)}
           >
             Home
+          </Link>
+          <Link
+            href="/about"
+            className="py-2 no-underline text-foreground"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            About
           </Link>
           <Link
             href="/trips"
