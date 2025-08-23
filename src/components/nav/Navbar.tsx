@@ -9,6 +9,10 @@ import { Menu, X } from "lucide-react";
 interface User {
   id: string;
   email: string;
+  user_metadata?: {
+    full_name?: string;
+  };
+  avatar_url?: string;
 }
 
 export default function Navbar() {
@@ -32,6 +36,8 @@ export default function Navbar() {
           setUser({
             id: session.user.id,
             email: session.user.email!,
+            user_metadata: session.user.user_metadata,
+            avatar_url: session.user.user_metadata?.avatar_url,
           });
         }
       } catch (error) {
@@ -51,6 +57,8 @@ export default function Navbar() {
         setUser({
           id: session.user.id,
           email: session.user.email!,
+          user_metadata: session.user.user_metadata,
+          avatar_url: session.user.user_metadata?.avatar_url,
         });
       } else {
         setUser(null);
@@ -146,7 +154,28 @@ export default function Navbar() {
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                 className="flex items-center gap-2 rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
               >
-                <span>{user.email}</span>
+                {user.avatar_url ? (
+                  <img
+                    src={user.avatar_url}
+                    alt="Profile avatar"
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                    <svg
+                      className="w-4 h-4 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                )}
+
                 <svg
                   className={`h-4 w-4 transition-transform ${
                     isProfileOpen ? "rotate-180" : ""
@@ -266,8 +295,30 @@ export default function Navbar() {
           <div className="mt-4 flex flex-col gap-2">
             {user ? (
               <div className="space-y-2">
-                <div className="text-sm text-gray-600 px-2 py-1">
-                  Hello, {user.email}
+                <div className="text-sm text-gray-600 px-2 py-1 flex items-center gap-2">
+                  {user.avatar_url ? (
+                    <img
+                      src={user.avatar_url}
+                      alt="Profile avatar"
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                      <svg
+                        className="w-3 h-3 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 9a7 0 1114 0H3z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                  Hello,{" "}
+                  {user.user_metadata?.full_name || user.email?.split("@")[0]}
                 </div>
                 <Link
                   href="/dashboard"

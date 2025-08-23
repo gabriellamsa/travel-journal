@@ -7,6 +7,7 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Camera } from "lucide-react";
 import { getProfile, upsertProfile } from "@/lib/profiles";
 import { Profile } from "@/lib/types";
+import { useProfile } from "@/contexts/ProfileContext";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -36,6 +37,7 @@ export default function EditProfile() {
     created_at: "",
     updated_at: "",
   });
+  const { updateProfile: updateContextProfile } = useProfile();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -204,6 +206,8 @@ export default function EditProfile() {
 
       if (updatedProfile) {
         setProfile(updatedProfile);
+        // Update the context so other components can see the changes immediately
+        updateContextProfile(updatedProfile);
         setSuccess("Profile updated successfully!");
 
         // Clear success message after 3 seconds
@@ -281,9 +285,9 @@ export default function EditProfile() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                {profile.username || "Traveler"}
+                {profile["display-name"] || "User"}
               </h1>
-              <p className="text-gray-600">@{profile.username || "traveler"}</p>
+              <p className="text-gray-600">@{profile.username || "user"}</p>
             </div>
           </div>
 

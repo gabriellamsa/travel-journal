@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
+import { ProfileProvider } from "@/contexts/ProfileContext";
 
 const font = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -23,7 +24,9 @@ export default function RootLayout({
         className={`${font.className} antialiased bg-gray-50 text-gray-900`}
       >
         <div className="min-h-screen flex flex-col">
-          <main className="flex-1">{children}</main>
+          <ProfileProvider>
+            <main className="flex-1">{children}</main>
+          </ProfileProvider>
         </div>
       </body>
     </html>

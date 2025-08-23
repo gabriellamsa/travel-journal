@@ -5,6 +5,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import Navbar from "@/components/nav/Navbar";
 import Footer from "@/components/footer/Footer";
+import { getProfile } from "@/lib/profiles";
+import { useProfile } from "@/contexts/ProfileContext";
 import {
   User,
   MapPin,
@@ -36,10 +38,13 @@ export default function DashboardLayout({
   subtitle = "Manage your travel journal",
 }: DashboardLayoutProps) {
   const [user, setUser] = useState<any>(null);
+  const [localProfile, setLocalProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { profile: contextProfile, updateProfile: updateContextProfile } =
+    useProfile();
 
   // Close sidebar when clicking outside
   const closeSidebar = () => setSidebarOpen(false);
@@ -71,6 +76,18 @@ export default function DashboardLayout({
         return;
       }
       setUser(session.user);
+
+      // Load user profile to get display name
+      const userProfile = await getProfile(session.user.id);
+      console.log("DashboardLayout - User profile loaded:", userProfile);
+      if (userProfile) {
+        setLocalProfile(userProfile);
+        updateContextProfile(userProfile);
+        console.log("DashboardLayout - Profile set to state:", userProfile);
+      } else {
+        console.log("DashboardLayout - No profile found for user");
+      }
+
       setLoading(false);
     };
 
@@ -102,7 +119,7 @@ export default function DashboardLayout({
         {/* Mobile Sidebar Overlay */}
         {sidebarOpen && (
           <div
-            className="fixed inset-0 backdrop-blur-sm bg-white/30 z-40 lg:hidden"
+            className="fixed inset-0 backdrop-blur-sm bg-white/30 z-30 lg:hidden"
             onClick={closeSidebar}
           />
         )}
@@ -110,7 +127,7 @@ export default function DashboardLayout({
         {/* Left Sidebar */}
         <div
           className={`
-            fixed lg:static inset-y-0 left-0 z-50 w-80 bg-white border-r border-gray-200 flex flex-col
+            fixed lg:static inset-y-0 left-0 z-40 w-80 bg-white border-r border-gray-200 flex flex-col
             transform transition-transform duration-300 ease-in-out shadow-lg lg:shadow-none
             ${
               sidebarOpen
@@ -140,7 +157,23 @@ export default function DashboardLayout({
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900">
-                  {user?.user_metadata?.full_name || "Traveler"}
+                  {(() => {
+                    const displayName =
+                      contextProfile?.["display-name"] ||
+                      localProfile?.["display-name"] ||
+                      user?.user_metadata?.full_name ||
+                      user?.email?.split("@")[0] ||
+                      "User";
+                    console.log("DashboardLayout - Rendering display name:", {
+                      contextProfileDisplayName:
+                        contextProfile?.["display-name"],
+                      localProfileDisplayName: localProfile?.["display-name"],
+                      userFullName: user?.user_metadata?.full_name,
+                      emailFirstPart: user?.email?.split("@")[0],
+                      finalDisplayName: displayName,
+                    });
+                    return displayName;
+                  })()}
                 </h3>
                 <p className="text-sm text-gray-500">{user?.email}</p>
               </div>
