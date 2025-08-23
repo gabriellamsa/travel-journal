@@ -2,15 +2,27 @@ export interface Profile {
   id: string;
   created_at: string;
   updated_at: string | null;
-  full_name: string | null;
+  "display-name": string | null;
   avatar_url: string | null;
   bio: string | null;
+  username: string | null;
+  location: string | null;
+  x: string | null;
+  instagram: string | null;
+  facebook: string | null;
+  website: string | null;
 }
 
 export interface ProfileUpdate {
-  full_name?: string;
+  "display-name"?: string;
   avatar_url?: string;
   bio?: string;
+  username?: string;
+  location?: string;
+  x?: string;
+  instagram?: string;
+  facebook?: string;
+  website?: string;
 }
 
 export interface User {
