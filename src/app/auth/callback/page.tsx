@@ -21,9 +21,15 @@ export default function AuthCallback() {
         // create or update user profile
         try {
           await upsertProfile(session.user.id, {
-            full_name: "",
+            "display-name": "",
             bio: "",
             avatar_url: "",
+            username: "",
+            location: "",
+            x: "",
+            instagram: "",
+            facebook: "",
+            website: "",
           });
         } catch (profileError) {
           console.error("Error creating profile:", profileError);

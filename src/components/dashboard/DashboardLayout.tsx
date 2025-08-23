@@ -199,9 +199,9 @@ export default function DashboardLayout({
                   <span>Dashboard</span>
                 </a>
                 <a
-                  href="#"
+                  href="/profile"
                   className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                    pathname.includes("/dashboard") && pathname !== "/dashboard"
+                    isActive("/profile")
                       ? "text-blue-600 bg-blue-50 font-medium"
                       : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
                   }`}
