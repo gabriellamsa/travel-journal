@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { MapPin, Globe, Calendar, Heart } from "lucide-react";
+import { MapPin, Globe, Calendar, Heart, Tag } from "lucide-react";
 import { PublicProfileProps } from "./types";
 import Navbar from "@/components/nav/Navbar";
 import Footer from "@/components/footer/Footer";
@@ -16,6 +16,7 @@ const PublicProfile: React.FC<PublicProfileProps> = ({
 }) => {
   const [selectedMemory, setSelectedMemory] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [localMemories, setLocalMemories] = useState(memories);
 
   const handleMemoryClick = (memory: any) => {
     setSelectedMemory(memory);
@@ -29,18 +30,65 @@ const PublicProfile: React.FC<PublicProfileProps> = ({
 
   const handleUpdateMemory = (updatedMemory: any) => {
     // Update the memory in the local state
-    const updatedMemories = memories.map((m) =>
-      m.id === updatedMemory.id ? updatedMemory : m
+    setLocalMemories((prev) =>
+      prev.map((m) => (m.id === updatedMemory.id ? updatedMemory : m))
     );
-    // Update the parent component state
-    if (typeof window !== "undefined") {
-      // Dispatch a custom event to notify parent components
-      window.dispatchEvent(
-        new CustomEvent("memoryUpdated", {
-          detail: { memory: updatedMemory },
-        })
+  };
+
+  // Listen for memory updates from other components
+  useEffect(() => {
+    const handleMemoryUpdate = (event: CustomEvent) => {
+      const { memory } = event.detail;
+      setLocalMemories((prev) =>
+        prev.map((m) => (m.id === memory.id ? memory : m))
       );
-    }
+    };
+
+    window.addEventListener(
+      "memoryUpdated",
+      handleMemoryUpdate as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        "memoryUpdated",
+        handleMemoryUpdate as EventListener
+      );
+    };
+  }, []);
+
+  const palette = [
+    {
+      bg: "bg-blue-100",
+      fg: "text-blue-800",
+    },
+    {
+      bg: "bg-emerald-100",
+      fg: "text-emerald-800",
+    },
+    {
+      bg: "bg-purple-100",
+      fg: "text-purple-800",
+    },
+    {
+      bg: "bg-amber-100",
+      fg: "text-amber-800",
+    },
+    {
+      bg: "bg-rose-100",
+      fg: "text-rose-800",
+    },
+    {
+      bg: "bg-cyan-100",
+      fg: "text-cyan-800",
+    },
+  ];
+
+  const colorFor = (tag: string) => {
+    let hash = 0;
+    for (let i = 0; i < tag.length; i++)
+      hash = (hash * 31 + tag.charCodeAt(i)) >>> 0;
+    return palette[hash % palette.length];
   };
   return (
     <div className="min-h-screen bg-gray-50">
@@ -258,9 +306,9 @@ const PublicProfile: React.FC<PublicProfileProps> = ({
           <h3 className="text-2xl sm:text-3xl font-bold text-black mb-4 sm:mb-6">
             Memories
           </h3>
-          {memories.length > 0 ? (
+          {localMemories.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-              {memories.map((memory) => (
+              {localMemories.map((memory) => (
                 <div
                   key={memory.id}
                   className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow shadow-sm cursor-pointer"
@@ -298,6 +346,26 @@ const PublicProfile: React.FC<PublicProfileProps> = ({
                       <Calendar className="w-3 h-3 mr-1 flex-shrink-0" />
                       {memory.date}
                     </p>
+                    {memory.tags && memory.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {memory.tags.slice(0, 3).map((tag, index) => {
+                          const color = colorFor(tag);
+                          return (
+                            <span
+                              key={index}
+                              className={`inline-flex items-center px-2 py-1 ${color.bg} ${color.fg} rounded-full text-xs`}
+                            >
+                              {tag}
+                            </span>
+                          );
+                        })}
+                        {memory.tags.length > 3 && (
+                          <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
+                            +{memory.tags.length - 3}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

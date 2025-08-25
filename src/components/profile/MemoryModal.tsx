@@ -1,7 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { X, Edit, MapPin, Calendar, Tag, Camera, Loader2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  X,
+  Edit,
+  MapPin,
+  Calendar,
+  Tag,
+  Camera,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 import { updateTripEntry } from "@/lib/trips";
 import { TripEntry } from "@/lib/types";
@@ -36,6 +46,8 @@ export default function MemoryModal({
 }: MemoryModalProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [imageViewerOpen, setImageViewerOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [formData, setFormData] = useState({
     title: memory.title,
     content: memory.content || "",
@@ -99,6 +111,67 @@ export default function MemoryModal({
       tags: prev.tags?.filter((tag) => tag !== tagToRemove) || [],
     }));
   };
+
+  const openImageViewer = (index: number) => {
+    setCurrentImageIndex(index);
+    setImageViewerOpen(true);
+  };
+
+  const closeImageViewer = () => {
+    setImageViewerOpen(false);
+  };
+
+  const getAllImages = () => {
+    // Combine imageUrl and imageUrls, avoiding duplicates
+    const allImages = [memory.imageUrl];
+    if (memory.imageUrls) {
+      memory.imageUrls.forEach((url) => {
+        if (url !== memory.imageUrl) {
+          allImages.push(url);
+        }
+      });
+    }
+    return allImages;
+  };
+
+  const nextImage = () => {
+    const allImages = getAllImages();
+    setCurrentImageIndex((prev) =>
+      prev === allImages.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const previousImage = () => {
+    const allImages = getAllImages();
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? allImages.length - 1 : prev - 1
+    );
+  };
+
+  // Keyboard navigation
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (!imageViewerOpen) return;
+
+    switch (e.key) {
+      case "Escape":
+        closeImageViewer();
+        break;
+      case "ArrowLeft":
+        previousImage();
+        break;
+      case "ArrowRight":
+        nextImage();
+        break;
+    }
+  };
+
+  // Add keyboard event listener
+  useEffect(() => {
+    if (imageViewerOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [imageViewerOpen]);
 
   const palette = [
     {
@@ -179,13 +252,21 @@ export default function MemoryModal({
         {/* Content */}
         <div className="p-6">
           {/* Hero Image */}
-          <div className="relative h-64 sm:h-80 mb-6 rounded-lg overflow-hidden">
+          <div
+            className="relative h-64 sm:h-80 mb-6 rounded-lg overflow-hidden cursor-pointer group"
+            onClick={() => openImageViewer(0)}
+          >
             <img
               src={memory.imageUrl}
               alt={memory.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform group-hover:scale-105"
             />
             <div className="absolute bottom-4 left-4 text-4xl">📸</div>
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity text-white text-lg font-medium">
+                Click to view full size
+              </div>
+            </div>
           </div>
 
           {/* Title */}
@@ -240,22 +321,26 @@ export default function MemoryModal({
                 <span className="text-sm font-medium text-gray-700">Tags</span>
               </div>
               {isEditing ? (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "," || e.key === "Enter") {
-                          e.preventDefault();
-                          handleAddTag();
-                        }
-                      }}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Add tags (comma separated)"
-                    />
+                    <div className="relative flex-1">
+                      <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        type="text"
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "," || e.key === "Enter") {
+                            e.preventDefault();
+                            handleAddTag();
+                          }
+                        }}
+                        className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Add tags (comma separated)"
+                      />
+                    </div>
                     <button
+                      type="button"
                       onClick={handleAddTag}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
@@ -273,6 +358,7 @@ export default function MemoryModal({
                           >
                             {tag}
                             <button
+                              type="button"
                               onClick={() => handleRemoveTag(tag)}
                               className={`${color.close}`}
                             >
@@ -329,11 +415,12 @@ export default function MemoryModal({
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {memory.imageUrls.slice(1).map((url, index) => (
-                  <div key={index} className="relative">
+                  <div key={index} className="relative group">
                     <img
                       src={url}
                       alt={`Memory photo ${index + 2}`}
-                      className="w-full h-32 object-cover rounded-lg"
+                      className="w-full h-48 object-cover rounded-lg shadow-sm cursor-pointer transition-transform group-hover:scale-105"
+                      onClick={() => openImageViewer(index + 1)}
                     />
                   </div>
                 ))}
@@ -362,6 +449,68 @@ export default function MemoryModal({
           </div>
         )}
       </div>
+
+      {/* Image Viewer Modal */}
+      {imageViewerOpen && (
+        <div
+          className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-[60] p-4"
+          onClick={closeImageViewer}
+        >
+          <div
+            className="relative w-full h-full flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={closeImageViewer}
+              className="absolute top-4 right-4 z-10 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Navigation arrows */}
+            {(() => {
+              const allImages = getAllImages();
+              return allImages.length > 1 ? (
+                <>
+                  <button
+                    onClick={previousImage}
+                    className="absolute left-4 z-10 p-3 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-4 z-10 p-3 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                </>
+              ) : null;
+            })()}
+
+            {/* Image */}
+            <img
+              src={(() => {
+                const allImages = getAllImages();
+                return allImages[currentImageIndex];
+              })()}
+              alt={`Memory photo ${currentImageIndex + 1}`}
+              className="max-w-full max-h-full object-contain"
+            />
+
+            {/* Image counter */}
+            {(() => {
+              const allImages = getAllImages();
+              return allImages.length > 1 ? (
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full text-sm">
+                  {currentImageIndex + 1} / {allImages.length}
+                </div>
+              ) : null;
+            })()}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
