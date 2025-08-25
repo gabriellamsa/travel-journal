@@ -96,51 +96,43 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-black/10 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4">
+    <header className="sticky top-0 z-50 border-b border-blue-100 bg-white/60 backdrop-blur-md">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center gap-2">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 no-underline text-foreground"
+            className="inline-flex items-center gap-2 no-underline text-gray-900"
           >
-            <span className="font-bold tracking-tight">Travel Journal</span>
+            <span className="font-bold tracking-tight text-xl">
+              Travel Journal
+            </span>
           </Link>
         </div>
 
-        <nav className="hidden items-center gap-4 md:flex" aria-label="Primary">
+        <nav className="hidden items-center gap-6 md:flex" aria-label="Primary">
           <Link
             href="/"
-            className={`no-underline transition-all duration-200 hover:text-foreground hover:scale-105 ${
+            className={`no-underline transition-all duration-200 hover:text-blue-600 hover:scale-105 ${
               isActive("/")
-                ? "font-bold text-foreground"
-                : "text-foreground/70 hover:text-foreground/90"
+                ? "font-semibold text-blue-600"
+                : "text-gray-600 hover:text-gray-900"
             }`}
           >
             Home
           </Link>
           <Link
             href="/about"
-            className={`no-underline transition-all duration-200 hover:text-foreground hover:scale-105 ${
+            className={`no-underline transition-all duration-200 hover:text-blue-600 hover:scale-105 ${
               isActive("/about")
-                ? "font-bold text-foreground"
-                : "text-foreground/70 hover:text-foreground/90"
+                ? "font-semibold text-blue-600"
+                : "text-gray-600 hover:text-gray-900"
             }`}
           >
             About
           </Link>
           <Link
-            href="/trips"
-            className={`no-underline transition-all duration-200 hover:text-foreground hover:scale-105 ${
-              isActive("/trips")
-                ? "font-bold text-foreground"
-                : "text-foreground/70 hover:text-foreground/90"
-            }`}
-          >
-            Trips
-          </Link>
-          <Link
-            href="/create"
-            className="rounded-lg bg-foreground px-3 py-2 font-semibold text-background no-underline transition-all duration-200 hover:bg-foreground/90 hover:scale-105"
+            href="/demo/create-trip"
+            className="rounded-xl bg-blue-400 px-6 py-2 font-semibold text-white no-underline transition-all duration-200 hover:bg-blue-500 hover:shadow-lg hover:scale-105"
           >
             Create Trip
           </Link>
@@ -152,7 +144,7 @@ export default function Navbar() {
             <div className="relative" ref={profileRef}>
               <button
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center gap-2 rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                className="flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition-all duration-200 hover:bg-blue-100 hover:scale-105"
               >
                 {user.avatar_url ? (
                   <img
@@ -161,7 +153,7 @@ export default function Navbar() {
                     className="w-8 h-8 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center">
                     <svg
                       className="w-4 h-4 text-white"
                       fill="currentColor"
@@ -195,24 +187,24 @@ export default function Navbar() {
 
               {/* profile dropdown */}
               {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white py-2 shadow-xl ring-1 ring-blue-100">
                   <Link
                     href="/dashboard"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                     onClick={() => setIsProfileOpen(false)}
                   >
                     Dashboard
                   </Link>
                   <Link
                     href="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                     onClick={() => setIsProfileOpen(false)}
                   >
                     Profile
                   </Link>
                   <button
                     onClick={handleSignOut}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
                   >
                     Sign Out
                   </button>
@@ -223,13 +215,13 @@ export default function Navbar() {
             <>
               <Link
                 href="/login"
-                className="rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition-all duration-200 hover:bg-blue-100 hover:scale-105"
               >
                 Log in
               </Link>
               <Link
                 href="/register"
-                className="rounded-lg bg-gray-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-700"
+                className="rounded-xl bg-blue-400 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-blue-500 hover:shadow-lg hover:scale-105"
               >
                 Create Free Account
               </Link>
@@ -242,27 +234,27 @@ export default function Navbar() {
           aria-label="Toggle menu"
           aria-expanded={isMenuOpen}
           onClick={() => setIsMenuOpen((v) => !v)}
-          className="group relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-black/10 p-2 transition-all duration-200 hover:border-black/20 hover:bg-white/50 md:hidden"
+          className="group relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-blue-200 p-2 transition-all duration-200 hover:border-blue-300 hover:bg-blue-50 md:hidden"
         >
           {isMenuOpen ? (
-            <X className="h-5 w-5 text-foreground" />
+            <X className="h-5 w-5 text-gray-700" />
           ) : (
-            <Menu className="h-5 w-5 text-foreground" />
+            <Menu className="h-5 w-5 text-gray-700" />
           )}
         </button>
       </div>
 
       {isMenuOpen && (
         <nav
-          className="flex flex-col gap-1 border-t border-black/10 px-5 pb-4 pt-3 md:hidden"
+          className="flex flex-col gap-1 border-t border-blue-100 px-4 sm:px-6 lg:px-8 pb-4 pt-3 md:hidden bg-white/75 backdrop-blur-md"
           aria-label="Mobile"
         >
           <Link
             href="/"
-            className={`py-2 no-underline transition-all duration-200 hover:text-foreground hover:scale-105 ${
+            className={`py-2 no-underline transition-all duration-200 hover:text-blue-600 hover:scale-105 ${
               isActive("/")
-                ? "font-bold text-foreground"
-                : "text-foreground/70 hover:text-foreground/90"
+                ? "font-semibold text-blue-600"
+                : "text-gray-600 hover:text-gray-900"
             }`}
             onClick={() => setIsMenuOpen(false)}
           >
@@ -270,29 +262,18 @@ export default function Navbar() {
           </Link>
           <Link
             href="/about"
-            className={`py-2 no-underline transition-all duration-200 hover:text-foreground hover:scale-105 ${
+            className={`py-2 no-underline transition-all duration-200 hover:text-blue-600 hover:scale-105 ${
               isActive("/about")
-                ? "font-bold text-foreground"
-                : "text-foreground/70 hover:text-foreground/90"
+                ? "font-semibold text-blue-600"
+                : "text-gray-600 hover:text-gray-900"
             }`}
             onClick={() => setIsMenuOpen(false)}
           >
             About
           </Link>
           <Link
-            href="/trips"
-            className={`py-2 no-underline transition-all duration-200 hover:text-foreground hover:scale-105 ${
-              isActive("/trips")
-                ? "font-bold text-foreground"
-                : "text-foreground/70 hover:text-foreground/90"
-            }`}
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Trips
-          </Link>
-          <Link
-            href="/create"
-            className="mt-1 inline-block w-fit rounded-lg bg-foreground px-3 py-2 font-semibold text-background no-underline transition-all duration-200 hover:bg-foreground/90 hover:scale-105"
+            href="/demo/create-trip"
+            className="mt-1 inline-block w-fit rounded-xl bg-blue-400 px-6 py-2 font-semibold text-white no-underline transition-all duration-200 hover:bg-blue-500 hover:shadow-lg hover:scale-105"
             onClick={() => setIsMenuOpen(false)}
           >
             Create Trip
@@ -310,7 +291,7 @@ export default function Navbar() {
                       className="w-6 h-6 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                    <div className="w-6 h-6 bg-blue-400 rounded-full flex items-center justify-center">
                       <svg
                         className="w-3 h-3 text-white"
                         fill="currentColor"
@@ -329,14 +310,14 @@ export default function Navbar() {
                 </div>
                 <Link
                   href="/dashboard"
-                  className="rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-center text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                  className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all duration-200 hover:bg-blue-100"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Dashboard
                 </Link>
                 <Link
                   href="/profile"
-                  className="rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-center text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                  className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all duration-200 hover:bg-blue-100"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Profile
@@ -346,7 +327,7 @@ export default function Navbar() {
                     handleSignOut();
                     setIsMenuOpen(false);
                   }}
-                  className="rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-center text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                  className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all duration-200 hover:bg-blue-100"
                 >
                   Sign Out
                 </button>
@@ -355,14 +336,14 @@ export default function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className="rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-center text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                  className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all duration-200 hover:bg-blue-100"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Log in
                 </Link>
                 <Link
                   href="/register"
-                  className="rounded-lg bg-gray-600 px-4 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-gray-700"
+                  className="rounded-xl bg-blue-400 px-4 py-2 text-center text-sm font-medium text-white transition-all duration-200 hover:bg-blue-500 hover:shadow-lg"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Create Free Account

@@ -20,12 +20,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${font.className} antialiased bg-gray-50 text-gray-900`}
-      >
-        <div className="min-h-screen flex flex-col">
+      <body className={`${font.className} antialiased text-gray-900`}>
+        <div className="min-h-screen flex flex-col relative">
+          {/* Global gradient background */}
+          <div className="fixed inset-0 bg-gradient-to-b from-slate-50 via-blue-50 via-indigo-50 via-slate-100 to-gray-100 pointer-events-none"></div>
+
           <ProfileProvider>
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 relative z-10">{children}</main>
           </ProfileProvider>
         </div>
       </body>
