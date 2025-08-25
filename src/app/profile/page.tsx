@@ -87,6 +87,7 @@ export default function ProfilePage() {
               ? e.image_urls[0] // Primeira foto como cover
               : "/about-founder.jpg",
           content: e.content || "",
+          notes: (e as any).notes || "",
           tags: e.tags || [],
           imageUrls: e.image_urls || [],
         }));

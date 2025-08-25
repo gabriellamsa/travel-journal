@@ -121,3 +121,12 @@ CREATE TRIGGER update_trips_updated_at BEFORE UPDATE ON trips
 
 CREATE TRIGGER update_trip_entries_updated_at BEFORE UPDATE ON trip_entries
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Add notes column to trip_entries table
+ALTER TABLE trip_entries 
+ADD COLUMN notes TEXT;
+
+-- Update existing records to set notes to content (optional migration)
+UPDATE trip_entries 
+SET notes = content 
+WHERE notes IS NULL AND content IS NOT NULL;

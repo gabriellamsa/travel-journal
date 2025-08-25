@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   X,
   Edit,
@@ -11,6 +11,7 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  Plus,
 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 import { updateTripEntry } from "@/lib/trips";
@@ -29,6 +30,7 @@ interface MemoryModalProps {
     date: string;
     imageUrl: string;
     content?: string;
+    notes?: string;
     mood?: string;
     tags?: string[];
     imageUrls?: string[];
@@ -51,14 +53,26 @@ export default function MemoryModal({
   const [formData, setFormData] = useState({
     title: memory.title,
     content: memory.content || "",
+    notes: memory.notes || "",
     location: memory.location,
     tags: memory.tags || [],
   });
+  const [noteInput, setNoteInput] = useState("");
+  const [notesList, setNotesList] = useState<string[]>(
+    memory.notes
+      ? memory.notes
+          .split("\n")
+          .filter((note) => note.trim())
+          .map((note) => (note.startsWith("- ") ? note : `- ${note}`))
+      : []
+  );
   const [tagInput, setTagInput] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSave = async () => {
     setSaving(true);
     try {
+      // Update main fields
       const updated = await updateTripEntry(memory.id, {
         title: formData.title,
         content: formData.content,
@@ -66,11 +80,23 @@ export default function MemoryModal({
         tags: formData.tags,
       });
 
+      // Update notes field separately
       if (updated) {
+        const notesString = notesList.join("\n");
+        const { error: notesError } = await supabase
+          .from("trip_entries")
+          .update({ notes: notesString })
+          .eq("id", memory.id);
+
+        if (notesError) {
+          console.error("Error updating notes:", notesError);
+        }
+
         const updatedMemory = {
           ...memory,
           title: formData.title,
           content: formData.content,
+          notes: notesList.join("\n"),
           location: formData.location,
           tags: formData.tags,
         };
@@ -110,6 +136,24 @@ export default function MemoryModal({
       ...prev,
       tags: prev.tags?.filter((tag) => tag !== tagToRemove) || [],
     }));
+  };
+
+  const handleAddNote = () => {
+    if (noteInput.trim()) {
+      // Split by lines and add dash to each line
+      const lines = noteInput.split("\n").filter((line) => line.trim());
+      const notesWithDashes = lines.map((line) => `- ${line.trim()}`);
+      setNotesList((prev) => [...prev, ...notesWithDashes]);
+      setNoteInput("");
+      // Reset textarea height
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+      }
+    }
+  };
+
+  const handleRemoveNote = (indexToRemove: number) => {
+    setNotesList((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
 
   const openImageViewer = (index: number) => {
@@ -217,114 +261,239 @@ export default function MemoryModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-2xl max-w-5xl w-full max-h-[95vh] overflow-y-auto shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">
-            {isEditing ? "Edit Memory" : "Memory Details"}
-          </h2>
-          <div className="flex items-center gap-2">
-            {!isEditing && (
+        {/* Modern Header */}
+        <div className="relative h-80 sm:h-96 overflow-hidden group">
+          <img
+            src={memory.imageUrl}
+            alt={memory.title}
+            className="w-full h-full object-cover cursor-pointer transition-transform group-hover:scale-105"
+            onClick={() => openImageViewer(0)}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+
+          {/* View Full Size Indicator */}
+          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
+              <Camera className="w-5 h-5 text-white" />
+            </div>
+          </div>
+
+          {/* Header Content */}
+          <div className="absolute top-0 left-0 right-0 p-6">
+            <div className="flex items-center justify-end">
               <button
-                onClick={() => setIsEditing(true)}
-                className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                title="Edit memory"
+                onClick={onClose}
+                className="p-2 bg-white/20 backdrop-blur-sm text-white rounded-full hover:bg-white/30 transition-all"
+                title="Close"
               >
-                <Edit className="w-5 h-5" />
+                <X className="w-5 h-5" />
               </button>
-            )}
-            <button
-              onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-              title="Close"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            </div>
+          </div>
+
+          {/* Hero Content */}
+          <div className="absolute bottom-0 left-0 right-0 p-6">
+            <div className="flex items-center gap-3 mb-2">
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, title: e.target.value }))
+                  }
+                  className="text-3xl sm:text-4xl font-bold text-white bg-transparent border-none outline-none placeholder-white/80 flex-1"
+                  placeholder="Memory title"
+                />
+              ) : (
+                <>
+                  <h1 className="text-3xl sm:text-4xl font-bold text-white flex-1">
+                    {memory.title}
+                  </h1>
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="p-2 bg-white/20 backdrop-blur-sm text-white rounded-full hover:bg-white/30 transition-all"
+                    title="Edit memory"
+                  >
+                    <Edit className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            <div className="flex items-center gap-4 text-white/90 text-sm">
+              <div className="flex items-center gap-1">
+                <MapPin className="w-4 h-4" />
+                {isEditing ? (
+                  <input
+                    type="text"
+                    value={formData.location}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        location: e.target.value,
+                      }))
+                    }
+                    className="bg-transparent border-none outline-none placeholder-white/60"
+                    placeholder="Location"
+                  />
+                ) : (
+                  <span>{memory.location}</span>
+                )}
+              </div>
+              <div className="flex items-center gap-1">
+                <Calendar className="w-4 h-4" />
+                <span>{memory.date}</span>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-6">
-          {/* Hero Image */}
-          <div
-            className="relative h-64 sm:h-80 mb-6 rounded-lg overflow-hidden cursor-pointer group"
-            onClick={() => openImageViewer(0)}
-          >
-            <img
-              src={memory.imageUrl}
-              alt={memory.title}
-              className="w-full h-full object-cover transition-transform group-hover:scale-105"
-            />
-            <div className="absolute bottom-4 left-4 text-4xl">📸</div>
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity text-white text-lg font-medium">
-                Click to view full size
+        <div className="p-8">
+          {/* Content */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <span className="text-blue-600 text-sm font-medium">📄</span>
               </div>
+              <h3 className="text-lg font-semibold text-gray-900">Content</h3>
             </div>
+
+            {isEditing ? (
+              <textarea
+                value={formData.content}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, content: e.target.value }))
+                }
+                rows={6}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none bg-gray-50"
+                placeholder="Write detailed content about your memory..."
+              />
+            ) : (
+              <div className="bg-gray-50 rounded-xl p-6 min-h-[120px]">
+                <p className="text-gray-700 leading-relaxed">
+                  {memory.content || (
+                    <span className="text-gray-400 italic">
+                      No content added yet. Click edit to add your thoughts
+                      about this memory.
+                    </span>
+                  )}
+                </p>
+              </div>
+            )}
+          </div>
+          {/* Notes Section */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <span className="text-blue-600 text-sm font-medium">📝</span>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Notes</h3>
+            </div>
+
+            {isEditing ? (
+              <div className="space-y-4">
+                <div className="relative">
+                  <textarea
+                    ref={textareaRef}
+                    value={noteInput}
+                    onChange={(e) => {
+                      setNoteInput(e.target.value);
+                      // Auto-resize the textarea
+                      e.target.style.height = "auto";
+                      e.target.style.height =
+                        Math.min(e.target.scrollHeight, 200) + "px";
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleAddNote();
+                      }
+                    }}
+                    className="w-full px-4 py-4 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 resize-none min-h-[80px] max-h-[200px] overflow-y-auto text-sm leading-relaxed"
+                    placeholder="Write your notes here...&#10;You can write multiple lines&#10;Press Enter to add them as separate notes"
+                    rows={3}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddNote}
+                    className="absolute top-3 right-3 p-2 text-gray-400 hover:text-blue-600 transition-all duration-200 hover:scale-105"
+                    title="Add note"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+                {notesList.length > 0 && (
+                  <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                    <div className="space-y-2">
+                      {notesList.map((note, index) => (
+                        <div
+                          key={index}
+                          className="flex items-start gap-3 py-2 border-b border-gray-100 last:border-b-0"
+                        >
+                          <span className="text-gray-700 flex-1 leading-relaxed">
+                            {note}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveNote(index)}
+                            className="text-red-400 hover:text-red-600 transition-colors text-sm font-medium"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="bg-gray-50 rounded-xl p-6 min-h-[120px]">
+                {notesList.length > 0 ? (
+                  <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+                    <ul className="space-y-2">
+                      {notesList.map((note, index) => (
+                        <li
+                          key={index}
+                          className="text-gray-700 leading-relaxed py-1 border-b border-gray-100 last:border-b-0"
+                        >
+                          {note}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <span className="text-gray-400 italic">
+                    No notes added yet. Click edit to add your thoughts about
+                    this memory.
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Title */}
-          {isEditing ? (
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, title: e.target.value }))
-              }
-              className="text-3xl font-bold text-gray-900 mb-4 w-full border-none focus:ring-0 focus:outline-none"
-              placeholder="Memory title"
-            />
-          ) : (
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              {memory.title}
-            </h1>
-          )}
-
-          {/* Metadata */}
-          <div className="flex flex-wrap items-center gap-4 text-gray-600 mb-6">
-            <div className="flex items-center gap-1">
-              <MapPin className="w-4 h-4" />
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={formData.location}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      location: e.target.value,
-                    }))
-                  }
-                  className="border-none focus:ring-0 focus:outline-none bg-transparent"
-                  placeholder="Location"
-                />
-              ) : (
-                <span>{memory.location}</span>
-              )}
-            </div>
-            <div className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
-              <span>{memory.date}</span>
-            </div>
-          </div>
-
-          {/* Tags */}
+          {/* Tags Section */}
           {(memory.tags && memory.tags.length > 0) || isEditing ? (
-            <div className="mb-6">
-              <div className="flex items-center gap-2 mb-2">
-                <Tag className="w-4 h-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Tags</span>
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Tag className="w-4 h-4 text-purple-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">Tags</h3>
               </div>
+
               {isEditing ? (
                 <div className="space-y-4">
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <div className="relative">
+                    <div className="relative">
+                      <Tag className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 z-10" />
                       <input
                         type="text"
                         value={tagInput}
@@ -335,16 +504,17 @@ export default function MemoryModal({
                             handleAddTag();
                           }
                         }}
-                        className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full pl-12 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-gray-50"
                         placeholder="Add tags (comma separated)"
                       />
                     </div>
                     <button
                       type="button"
                       onClick={handleAddTag}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="absolute top-3 right-3 p-2 text-gray-400 hover:text-purple-600 transition-all duration-200 hover:scale-105"
+                      title="Add tag"
                     >
-                      Add
+                      <Plus className="w-4 h-4" />
                     </button>
                   </div>
                   {formData.tags && formData.tags.length > 0 && (
@@ -354,13 +524,13 @@ export default function MemoryModal({
                         return (
                           <span
                             key={index}
-                            className={`inline-flex items-center gap-1 px-3 py-1 ${color.bg} ${color.fg} rounded-full text-sm`}
+                            className={`inline-flex items-center gap-2 px-4 py-2 ${color.bg} ${color.fg} rounded-full text-sm font-medium`}
                           >
                             {tag}
                             <button
                               type="button"
                               onClick={() => handleRemoveTag(tag)}
-                              className={`${color.close}`}
+                              className={`${color.close} hover:scale-110 transition-transform`}
                             >
                               ×
                             </button>
@@ -377,7 +547,7 @@ export default function MemoryModal({
                     return (
                       <span
                         key={index}
-                        className={`inline-flex items-center px-3 py-1 ${color.bg} ${color.fg} rounded-full text-sm`}
+                        className={`inline-flex items-center px-4 py-2 ${color.bg} ${color.fg} rounded-full text-sm font-medium`}
                       >
                         {tag}
                       </span>
@@ -388,40 +558,24 @@ export default function MemoryModal({
             </div>
           ) : null}
 
-          {/* Content */}
-          <div className="prose max-w-none">
-            {isEditing ? (
-              <textarea
-                value={formData.content}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, content: e.target.value }))
-                }
-                rows={8}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                placeholder="Write about your memory..."
-              />
-            ) : (
-              <div className="text-gray-700 leading-relaxed">
-                {memory.content || "No content available for this memory."}
-              </div>
-            )}
-          </div>
-
           {/* Additional Images */}
           {memory.imageUrls && memory.imageUrls.length > 1 && (
-            <div className="mt-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                More Photos
-              </h3>
+            <div className="mt-8 mb-8">
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {memory.imageUrls.slice(1).map((url, index) => (
                   <div key={index} className="relative group">
                     <img
                       src={url}
                       alt={`Memory photo ${index + 2}`}
-                      className="w-full h-48 object-cover rounded-lg shadow-sm cursor-pointer transition-transform group-hover:scale-105"
+                      className="w-full h-48 object-cover rounded-xl shadow-sm cursor-pointer transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg"
                       onClick={() => openImageViewer(index + 1)}
                     />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-xl pointer-events-none"></div>
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                      <div className="bg-white/90 backdrop-blur-sm rounded-full p-2">
+                        <Camera className="w-4 h-4 text-gray-700" />
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -431,17 +585,17 @@ export default function MemoryModal({
 
         {/* Footer */}
         {isEditing && (
-          <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+          <div className="sticky bottom-0 bg-white border-t border-gray-100 px-8 py-6 flex justify-end gap-4">
             <button
               onClick={() => setIsEditing(false)}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-6 py-3 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-all font-medium"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={saving}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all font-medium flex items-center gap-2 shadow-lg hover:shadow-xl"
             >
               {saving && <Loader2 className="w-4 h-4 animate-spin" />}
               Save Changes
@@ -453,7 +607,7 @@ export default function MemoryModal({
       {/* Image Viewer Modal */}
       {imageViewerOpen && (
         <div
-          className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-[60] p-4"
+          className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-[99999] p-4"
           onClick={closeImageViewer}
         >
           <div
