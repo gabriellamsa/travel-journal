@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { MapPin, Globe, Calendar, Heart, Tag } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { MapPin, Globe, Calendar, Heart, Tag, Edit } from "lucide-react";
 import { PublicProfileProps } from "./types";
 import Navbar from "@/components/nav/Navbar";
 import Footer from "@/components/footer/Footer";
@@ -14,6 +15,7 @@ const PublicProfile: React.FC<PublicProfileProps> = ({
   memories,
   mapPins,
 }) => {
+  const router = useRouter();
   const [selectedMemory, setSelectedMemory] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [localMemories, setLocalMemories] = useState(memories);
@@ -21,6 +23,10 @@ const PublicProfile: React.FC<PublicProfileProps> = ({
   const handleMemoryClick = (memory: any) => {
     setSelectedMemory(memory);
     setIsModalOpen(true);
+  };
+
+  const handleEditProfile = () => {
+    router.push("/dashboard/edit-profile");
   };
 
   const handleCloseModal = () => {
@@ -126,9 +132,18 @@ const PublicProfile: React.FC<PublicProfileProps> = ({
           <div className="flex-1 w-full text-center sm:text-left">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
               <div className="flex-1">
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-2">
-                  {profile.name}
-                </h2>
+                <div className="flex items-center gap-2 mb-2">
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black">
+                    {profile.name}
+                  </h2>
+                  <button
+                    onClick={handleEditProfile}
+                    className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                    title="Edit profile"
+                  >
+                    <Edit className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
+                </div>
                 {profile.username && (
                   <p className="text-base sm:text-lg text-gray-600 mb-2">
                     @{profile.username}
