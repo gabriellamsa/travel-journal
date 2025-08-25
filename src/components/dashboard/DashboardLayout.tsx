@@ -234,13 +234,6 @@ export default function DashboardLayout({
                   <span>My Trips</span>
                 </a>
                 <a
-                  href="#"
-                  className="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                >
-                  <Heart className="w-5 h-5" />
-                  <span>Saved</span>
-                </a>
-                <a
                   href="/dashboard/create-trip"
                   className="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                 >

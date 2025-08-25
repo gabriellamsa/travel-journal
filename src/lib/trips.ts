@@ -199,3 +199,82 @@ export async function deleteTripEntry(entryId: string): Promise<boolean> {
     return false;
   }
 }
+
+// Dashboard statistics functions
+export async function getUserTripCount(userId?: string): Promise<number> {
+  try {
+    let query = supabase
+      .from("trips")
+      .select("id", { count: "exact" });
+
+    if (userId) {
+      query = query.eq("user_id", userId);
+    } else {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+      query = query.eq("user_id", user.id);
+    }
+
+    const { count, error } = await query;
+    if (error) throw error;
+    return count || 0;
+  } catch (error) {
+    console.error("Error fetching trip count:", error);
+    return 0;
+  }
+}
+
+export async function getUserMemoryCount(userId?: string): Promise<number> {
+  try {
+    let query = supabase
+      .from("trip_entries")
+      .select("id", { count: "exact" });
+
+    if (userId) {
+      query = query.eq("user_id", userId);
+    } else {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+      query = query.eq("user_id", user.id);
+    }
+
+    const { count, error } = await query;
+    if (error) throw error;
+    return count || 0;
+  } catch (error) {
+    console.error("Error fetching memory count:", error);
+    return 0;
+  }
+}
+
+export async function getRecentMemories(userId?: string, limit: number = 3): Promise<TripEntry[]> {
+  try {
+    let query = supabase
+      .from("trip_entries")
+      .select(`
+        *,
+        trips!inner(
+          id,
+          title,
+          destination
+        )
+      `)
+      .order("entry_date", { ascending: false })
+      .limit(limit);
+
+    if (userId) {
+      query = query.eq("user_id", userId);
+    } else {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+      query = query.eq("user_id", user.id);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error("Error fetching recent memories:", error);
+    return [];
+  }
+}

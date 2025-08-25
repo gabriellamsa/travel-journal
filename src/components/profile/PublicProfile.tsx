@@ -132,7 +132,7 @@ const PublicProfile: React.FC<PublicProfileProps> = ({
           <div className="flex-1 w-full text-center sm:text-left">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
                   <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black">
                     {profile.name}
                   </h2>
