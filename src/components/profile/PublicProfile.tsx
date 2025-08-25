@@ -163,8 +163,9 @@ const PublicProfile: React.FC<PublicProfileProps> = ({
           {trips.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {trips.map((trip) => (
-                <div
+                <a
                   key={trip.id}
+                  href={`/dashboard/trips/${trip.id}`}
                   className="bg-white rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow border border-gray-200"
                 >
                   <h4 className="text-lg sm:text-xl font-semibold text-black mb-3">
@@ -182,7 +183,7 @@ const PublicProfile: React.FC<PublicProfileProps> = ({
                       {trip.dates}
                     </p>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           ) : (

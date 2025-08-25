@@ -227,7 +227,7 @@ export default function DashboardLayout({
                   <span>Friends</span>
                 </a>
                 <a
-                  href="#"
+                  href="/dashboard/trips"
                   className="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                 >
                   <MapPin className="w-5 h-5" />
@@ -241,7 +241,7 @@ export default function DashboardLayout({
                   <span>Saved</span>
                 </a>
                 <a
-                  href="#"
+                  href="/dashboard/create-trip"
                   className="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                 >
                   <Plus className="w-5 h-5" />

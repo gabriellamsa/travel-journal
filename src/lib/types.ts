@@ -31,3 +31,77 @@ export interface User {
   created_at: string;
   profile?: Profile;
 }
+
+// Trip related types
+export interface Trip {
+  id: string;
+  created_at: string;
+  updated_at: string | null;
+  user_id: string;
+  title: string;
+  description: string | null;
+  destination: string;
+  start_date: string;
+  end_date: string;
+  is_public: boolean;
+  cover_image_url: string | null;
+  status: 'planning' | 'active' | 'completed' | 'cancelled';
+  tags: string[] | null;
+  budget: number | null;
+  currency: string | null;
+}
+
+export interface TripCreate {
+  title: string;
+  description?: string;
+  destination: string;
+  start_date: string;
+  end_date: string;
+  is_public?: boolean;
+  cover_image_url?: string;
+  status?: 'planning' | 'active' | 'completed' | 'cancelled';
+  tags?: string[];
+  budget?: number;
+  currency?: string;
+}
+
+export interface TripUpdate {
+  title?: string;
+  description?: string;
+  destination?: string;
+  start_date?: string;
+  end_date?: string;
+  is_public?: boolean;
+  cover_image_url?: string;
+  status?: 'planning' | 'active' | 'completed' | 'cancelled';
+  tags?: string[];
+  budget?: number;
+  currency?: string;
+}
+
+export interface TripEntry {
+  id: string;
+  created_at: string;
+  updated_at: string | null;
+  trip_id: string;
+  user_id: string;
+  title: string;
+  content: string | null;
+  location: string | null;
+  entry_date: string;
+  image_urls: string[] | null;
+  mood: 'excited' | 'happy' | 'neutral' | 'sad' | 'stressed' | null;
+  weather: string | null;
+  tags: string[] | null;
+}
+
+export interface TripEntryCreate {
+  title: string;
+  content?: string;
+  location?: string;
+  entry_date: string;
+  image_urls?: string[];
+  mood?: 'excited' | 'happy' | 'neutral' | 'sad' | 'stressed';
+  weather?: string;
+  tags?: string[];
+}
