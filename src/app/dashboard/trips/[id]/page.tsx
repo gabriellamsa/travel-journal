@@ -4,7 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { getTrip, getTripEntries, createTripEntry } from "@/lib/trips";
+import {
+  getTrip,
+  getTripEntries,
+  createTripEntry,
+  deleteTripEntry,
+  deleteTrip,
+} from "@/lib/trips";
 import { Trip, TripEntry, TripEntryCreate } from "@/lib/types";
 import {
   MapPin,
@@ -17,6 +23,8 @@ import {
   Edit,
   Trash2,
   Loader2,
+  Camera,
+  X,
 } from "lucide-react";
 
 const supabase = createClient(
@@ -39,7 +47,10 @@ export default function TripDetail() {
     mood: "happy",
     weather: "",
     tags: [],
+    image_urls: [],
   });
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
   const [tagInput, setTagInput] = useState("");
 
   const router = useRouter();
@@ -106,12 +117,64 @@ export default function TripDetail() {
     }));
   };
 
+  const uploadImages = async (files: File[]): Promise<string[]> => {
+    const uploadedUrls: string[] = [];
+
+    for (const file of files) {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `trip-entries/${tripId}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("trip-images")
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw new Error(
+          `Failed to upload ${file.name}: ${uploadError.message}`
+        );
+      }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("trip-images").getPublicUrl(filePath);
+
+      uploadedUrls.push(publicUrl);
+    }
+
+    return uploadedUrls;
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (selectedFiles.length + files.length > 5) {
+      alert("You can only upload up to 5 images per memory.");
+      return;
+    }
+    setSelectedFiles((prev) => [...prev, ...files]);
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleCreateEntry = async (e: React.FormEvent) => {
     e.preventDefault();
     setCreatingEntry(true);
+    setUploadingImages(true);
 
     try {
-      const entry = await createTripEntry(tripId, newEntry);
+      let imageUrls: string[] = [];
+
+      if (selectedFiles.length > 0) {
+        imageUrls = await uploadImages(selectedFiles);
+      }
+
+      const entry = await createTripEntry(tripId, {
+        ...newEntry,
+        image_urls: imageUrls,
+      });
+
       if (entry) {
         setEntries((prev) => [entry, ...prev]);
         setNewEntry({
@@ -122,14 +185,63 @@ export default function TripDetail() {
           mood: "happy",
           weather: "",
           tags: [],
+          image_urls: [],
         });
+        setSelectedFiles([]);
+        setTagInput("");
         setShowEntryForm(false);
       }
-    } catch (error) {
-      console.error("Error creating entry:", error);
-      alert("Failed to create entry. Please try again.");
+    } catch (error: any) {
+      alert(error?.message || "Failed to create memory");
     } finally {
       setCreatingEntry(false);
+      setUploadingImages(false);
+    }
+  };
+
+  const handleEditEntry = (entryId: string) => {
+    router.push(`/dashboard/trips/${tripId}/entries/${entryId}/edit`);
+  };
+
+  const handleDeleteEntry = async (entryId: string) => {
+    if (
+      !confirm(
+        "Are you sure you want to delete this memory? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const success = await deleteTripEntry(entryId);
+      if (success) {
+        setEntries((prev) => prev.filter((entry) => entry.id !== entryId));
+      } else {
+        alert("Failed to delete memory");
+      }
+    } catch (error: any) {
+      alert(error?.message || "Failed to delete memory");
+    }
+  };
+
+  const handleDeleteTrip = async () => {
+    if (
+      !confirm(
+        "Are you sure you want to delete this trip? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const success = await deleteTrip(tripId);
+      if (success) {
+        router.push("/dashboard/trips");
+      } else {
+        alert("Failed to delete trip");
+      }
+    } catch (error: any) {
+      alert(error?.message || "Failed to delete trip");
     }
   };
 
@@ -292,16 +404,7 @@ export default function TripDetail() {
                   <Edit className="w-5 h-5" />
                 </button>
                 <button
-                  onClick={() => {
-                    if (
-                      confirm(
-                        "Are you sure you want to delete this trip? This action cannot be undone."
-                      )
-                    ) {
-                      // TODO: Implement delete functionality
-                      console.log("Delete trip:", trip.id);
-                    }
-                  }}
+                  onClick={handleDeleteTrip}
                   className="p-2 text-gray-400 hover:text-red-600 transition-colors"
                   title="Delete trip"
                 >
@@ -456,6 +559,67 @@ export default function TripDetail() {
                     </div>
                   </div>
 
+                  {/* Image Upload */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Photos (up to 5)
+                    </label>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          onChange={handleFileSelect}
+                          className="hidden"
+                          id="image-upload"
+                          disabled={selectedFiles.length >= 5}
+                        />
+                        <label
+                          htmlFor="image-upload"
+                          className={`flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${
+                            selectedFiles.length >= 5
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
+                        >
+                          <Camera className="w-4 h-4" />
+                          <span className="text-sm">
+                            {selectedFiles.length >= 5
+                              ? "Max 5 photos"
+                              : "Add photos"}
+                          </span>
+                        </label>
+                        {selectedFiles.length > 0 && (
+                          <span className="text-sm text-gray-500">
+                            {selectedFiles.length}/5 selected
+                          </span>
+                        )}
+                      </div>
+
+                      {selectedFiles.length > 0 && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {selectedFiles.map((file, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={URL.createObjectURL(file)}
+                                alt={`Preview ${index + 1}`}
+                                className="w-full h-20 object-cover rounded-lg"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeFile(index)}
+                                className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="flex justify-end space-x-3">
                     <button
                       type="button"
@@ -472,7 +636,9 @@ export default function TripDetail() {
                       {creatingEntry ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Creating...</span>
+                          <span>
+                            {uploadingImages ? "Uploading..." : "Creating..."}
+                          </span>
                         </>
                       ) : (
                         <span>Save Memory</span>
@@ -532,10 +698,18 @@ export default function TripDetail() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <button className="p-1 text-gray-400 hover:text-gray-600 transition-colors">
+                        <button
+                          onClick={() => handleEditEntry(entry.id)}
+                          className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                          title="Edit memory"
+                        >
                           <Edit className="w-4 h-4" />
                         </button>
-                        <button className="p-1 text-gray-400 hover:text-red-600 transition-colors">
+                        <button
+                          onClick={() => handleDeleteEntry(entry.id)}
+                          className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                          title="Delete memory"
+                        >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -543,6 +717,22 @@ export default function TripDetail() {
 
                     {entry.content && (
                       <p className="text-gray-700 mb-3">{entry.content}</p>
+                    )}
+
+                    {entry.image_urls && entry.image_urls.length > 0 && (
+                      <div className="mb-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {entry.image_urls.map((url, index) => (
+                            <div key={index} className="relative">
+                              <img
+                                src={url}
+                                alt={`Memory photo ${index + 1}`}
+                                className="w-full h-24 object-cover rounded-lg"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     )}
 
                     {entry.tags && entry.tags.length > 0 && (

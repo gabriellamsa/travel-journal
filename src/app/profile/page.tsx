@@ -90,7 +90,7 @@ export default function ProfilePage() {
           }),
           imageUrl:
             e.image_urls && e.image_urls.length > 0
-              ? e.image_urls[0]
+              ? e.image_urls[0] // Primeira foto como cover
               : "/about-founder.jpg",
           emoji: e.mood ? moodToEmoji[e.mood] || "😊" : "😊",
         }));

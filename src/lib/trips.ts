@@ -133,6 +133,22 @@ export async function createTripEntry(tripId: string, entryData: TripEntryCreate
   }
 }
 
+export async function getTripEntry(entryId: string): Promise<TripEntry | null> {
+  try {
+    const { data, error } = await supabase
+      .from("trip_entries")
+      .select("*")
+      .eq("id", entryId)
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error fetching trip entry:", error);
+    return null;
+  }
+}
+
 export async function getTripEntries(tripId: string): Promise<TripEntry[]> {
   try {
     const { data, error } = await supabase
