@@ -69,6 +69,27 @@ export default function MemoryModal({
   const [tagInput, setTagInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Update formData when memory prop changes (for real-time updates)
+  useEffect(() => {
+    setFormData({
+      title: memory.title,
+      content: memory.content || "",
+      notes: memory.notes || "",
+      location: memory.location,
+      tags: memory.tags || [],
+    });
+
+    // Update notes list when memory notes change
+    setNotesList(
+      memory.notes
+        ? memory.notes
+            .split("\n")
+            .filter((note) => note.trim())
+            .map((note) => (note.startsWith("- ") ? note : `- ${note}`))
+        : []
+    );
+  }, [memory]);
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -480,7 +501,7 @@ export default function MemoryModal({
           </div>
 
           {/* Tags Section */}
-          {(memory.tags && memory.tags.length > 0) || isEditing ? (
+          {(formData.tags && formData.tags.length > 0) || isEditing ? (
             <div className="mb-8">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -542,7 +563,7 @@ export default function MemoryModal({
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-2">
-                  {memory.tags?.map((tag, index) => {
+                  {formData.tags?.map((tag, index) => {
                     const color = colorFor(tag);
                     return (
                       <span
