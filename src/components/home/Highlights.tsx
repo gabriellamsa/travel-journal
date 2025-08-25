@@ -88,15 +88,15 @@ export default function Highlights() {
         </div>
 
         {/* Highlights grid */}
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-3 justify-items-center">
           {HIGHLIGHTS.map((item, index) => (
             <div
               key={item.title}
-              className="group relative rounded-2xl bg-white p-8 shadow-lg ring-1 ring-blue-100 transition-all duration-300 hover:shadow-xl hover:scale-105"
+              className="group relative rounded-2xl bg-white p-8 shadow-lg ring-1 ring-blue-100 transition-all duration-300 hover:shadow-xl hover:scale-105 text-center"
             >
               {/* Icon with gradient background */}
               <div
-                className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r ${item.gradient} text-white mb-6 group-hover:scale-110 transition-transform duration-300`}
+                className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r ${item.gradient} text-white mb-6 group-hover:scale-110 transition-transform duration-300 mx-auto`}
               >
                 {item.icon}
               </div>

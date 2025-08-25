@@ -134,9 +134,9 @@ export default function About() {
               Different
             </h2>
           </div>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            <div className="group rounded-2xl bg-white p-8 shadow-lg ring-1 ring-blue-100 transition-all duration-300 hover:shadow-xl hover:scale-105">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 mb-4">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 justify-items-center">
+            <div className="group rounded-2xl bg-white p-8 shadow-lg ring-1 ring-blue-100 transition-all duration-300 hover:shadow-xl hover:scale-105 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 mb-4 mx-auto">
                 <span className="text-2xl">✨</span>
               </div>
               <h3 className="text-base font-semibold text-gray-900">
@@ -146,8 +146,8 @@ export default function About() {
                 A clean, intuitive interface without unnecessary complexity.
               </p>
             </div>
-            <div className="group rounded-2xl bg-white p-8 shadow-lg ring-1 ring-green-100 transition-all duration-300 hover:shadow-xl hover:scale-105">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 mb-4">
+            <div className="group rounded-2xl bg-white p-8 shadow-lg ring-1 ring-green-100 transition-all duration-300 hover:shadow-xl hover:scale-105 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 mb-4 mx-auto">
                 <span className="text-2xl">🔒</span>
               </div>
               <h3 className="text-base font-semibold text-gray-900">Privacy</h3>
@@ -155,8 +155,8 @@ export default function About() {
                 Your data stays yours, with full control over what's shared.
               </p>
             </div>
-            <div className="group rounded-2xl bg-white p-8 shadow-lg ring-1 ring-pink-100 transition-all duration-300 hover:shadow-xl hover:scale-105">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-pink-100 mb-4">
+            <div className="group rounded-2xl bg-white p-8 shadow-lg ring-1 ring-pink-100 transition-all duration-300 hover:shadow-xl hover:scale-105 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-pink-100 mb-4 mx-auto">
                 <span className="text-2xl">⚡</span>
               </div>
               <h3 className="text-base font-semibold text-gray-900">
@@ -166,8 +166,8 @@ export default function About() {
                 Fast, responsive, and optimized for all devices.
               </p>
             </div>
-            <div className="group rounded-2xl bg-white p-8 shadow-lg ring-1 ring-blue-100 transition-all duration-300 hover:shadow-xl hover:scale-105">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 mb-4">
+            <div className="group rounded-2xl bg-white p-8 shadow-lg ring-1 ring-blue-100 transition-all duration-300 hover:shadow-xl hover:scale-105 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 mb-4 mx-auto">
                 <span className="text-2xl">🎨</span>
               </div>
               <h3 className="text-base font-semibold text-gray-900">
