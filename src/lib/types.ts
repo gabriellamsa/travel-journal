@@ -88,8 +88,6 @@ export interface TripEntry {
   location: string | null;
   entry_date: string;
   image_urls: string[] | null;
-  mood: 'excited' | 'happy' | 'neutral' | 'sad' | 'stressed' | null;
-  weather: string | null;
   tags: string[] | null;
 }
 
@@ -99,7 +97,5 @@ export interface TripEntryCreate {
   location?: string;
   entry_date: string;
   image_urls?: string[];
-  mood?: 'excited' | 'happy' | 'neutral' | 'sad' | 'stressed';
-  weather?: string;
   tags?: string[];
 }

@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS trip_entries (
   entry_date DATE NOT NULL,
   image_urls TEXT[],
   mood TEXT CHECK (mood IN ('excited', 'happy', 'neutral', 'sad', 'stressed')),
-  weather TEXT,
   tags TEXT[]
 );
 

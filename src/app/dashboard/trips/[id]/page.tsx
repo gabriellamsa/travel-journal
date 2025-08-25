@@ -44,8 +44,6 @@ export default function TripDetail() {
     content: "",
     location: "",
     entry_date: new Date().toISOString().split("T")[0],
-    mood: "happy",
-    weather: "",
     tags: [],
     image_urls: [],
   });
@@ -99,6 +97,38 @@ export default function TripDetail() {
 
     loadTripData();
   }, [tripId, router]);
+
+  // Listen for memory updates
+  useEffect(() => {
+    const handleMemoryUpdate = (event: CustomEvent) => {
+      const { memory } = event.detail;
+      setEntries((prev) =>
+        prev.map((e) =>
+          e.id === memory.id
+            ? {
+                ...e,
+                title: memory.title,
+                content: memory.content,
+                location: memory.location,
+                tags: memory.tags,
+              }
+            : e
+        )
+      );
+    };
+
+    window.addEventListener(
+      "memoryUpdated",
+      handleMemoryUpdate as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        "memoryUpdated",
+        handleMemoryUpdate as EventListener
+      );
+    };
+  }, []);
 
   const handleAddTag = () => {
     if (tagInput.trim() && !newEntry.tags?.includes(tagInput.trim())) {
@@ -182,8 +212,6 @@ export default function TripDetail() {
           content: "",
           location: "",
           entry_date: new Date().toISOString().split("T")[0],
-          mood: "happy",
-          weather: "",
           tags: [],
           image_urls: [],
         });
@@ -265,23 +293,6 @@ export default function TripDetail() {
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getMoodIcon = (mood: string) => {
-    switch (mood) {
-      case "excited":
-        return "😃";
-      case "happy":
-        return "😊";
-      case "neutral":
-        return "😐";
-      case "sad":
-        return "😢";
-      case "stressed":
-        return "😰";
-      default:
-        return "😊";
     }
   };
 
@@ -513,44 +524,6 @@ export default function TripDetail() {
                         placeholder="Where were you on this day?"
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Mood
-                      </label>
-                      <select
-                        value={newEntry.mood}
-                        onChange={(e) =>
-                          setNewEntry((prev) => ({
-                            ...prev,
-                            mood: e.target.value as any,
-                          }))
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="excited">😃 Excited</option>
-                        <option value="happy">😊 Happy</option>
-                        <option value="neutral">😐 Neutral</option>
-                        <option value="sad">😢 Sad</option>
-                        <option value="stressed">😰 Stressed</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Weather
-                      </label>
-                      <input
-                        type="text"
-                        value={newEntry.weather}
-                        onChange={(e) =>
-                          setNewEntry((prev) => ({
-                            ...prev,
-                            weather: e.target.value,
-                          }))
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Sunny, rainy, etc."
-                      />
-                    </div>
                   </div>
 
                   {/* Image Upload */}
@@ -676,9 +649,7 @@ export default function TripDetail() {
                           <h3 className="text-lg font-semibold text-gray-900">
                             {entry.title}
                           </h3>
-                          <span className="text-2xl">
-                            {getMoodIcon(entry.mood || "happy")}
-                          </span>
+                          <span className="text-2xl">😊</span>
                         </div>
                         <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
                           <span>{formatDate(entry.entry_date)}</span>
@@ -688,7 +659,6 @@ export default function TripDetail() {
                               {entry.location}
                             </span>
                           )}
-                          {entry.weather && <span>☀️ {entry.weather}</span>}
                         </div>
                       </div>
                       <div className="flex items-center gap-2">

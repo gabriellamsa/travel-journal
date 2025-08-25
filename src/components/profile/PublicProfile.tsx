@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { MapPin, Globe, Calendar, Heart } from "lucide-react";
 import { PublicProfileProps } from "./types";
 import Navbar from "@/components/nav/Navbar";
 import Footer from "@/components/footer/Footer";
+import MemoryModal from "./MemoryModal";
 
 const PublicProfile: React.FC<PublicProfileProps> = ({
   profile,
@@ -13,6 +14,34 @@ const PublicProfile: React.FC<PublicProfileProps> = ({
   memories,
   mapPins,
 }) => {
+  const [selectedMemory, setSelectedMemory] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleMemoryClick = (memory: any) => {
+    setSelectedMemory(memory);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedMemory(null);
+  };
+
+  const handleUpdateMemory = (updatedMemory: any) => {
+    // Update the memory in the local state
+    const updatedMemories = memories.map((m) =>
+      m.id === updatedMemory.id ? updatedMemory : m
+    );
+    // Update the parent component state
+    if (typeof window !== "undefined") {
+      // Dispatch a custom event to notify parent components
+      window.dispatchEvent(
+        new CustomEvent("memoryUpdated", {
+          detail: { memory: updatedMemory },
+        })
+      );
+    }
+  };
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -234,7 +263,8 @@ const PublicProfile: React.FC<PublicProfileProps> = ({
               {memories.map((memory) => (
                 <div
                   key={memory.id}
-                  className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow shadow-sm"
+                  className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow shadow-sm cursor-pointer"
+                  onClick={() => handleMemoryClick(memory)}
                 >
                   <div className="relative h-40 sm:h-48">
                     {memory.imageUrl &&
@@ -252,16 +282,13 @@ const PublicProfile: React.FC<PublicProfileProps> = ({
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                        <span className="text-xl sm:text-2xl">
-                          {memory.emoji}
-                        </span>
+                        <span className="text-xl sm:text-2xl">📸</span>
                       </div>
                     )}
                   </div>
                   <div className="p-3 sm:p-4">
                     <h4 className="font-semibold text-black mb-2 flex items-center text-sm sm:text-base">
-                      <span className="truncate">{memory.title}</span>{" "}
-                      {memory.emoji}
+                      <span className="truncate">{memory.title}</span>
                     </h4>
                     <p className="text-gray-600 text-xs sm:text-sm mb-1 flex items-center">
                       <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
@@ -287,6 +314,16 @@ const PublicProfile: React.FC<PublicProfileProps> = ({
           )}
         </section>
       </div>
+
+      {/* Memory Modal */}
+      {selectedMemory && (
+        <MemoryModal
+          memory={selectedMemory}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onUpdate={handleUpdateMemory}
+        />
+      )}
 
       <Footer />
     </div>

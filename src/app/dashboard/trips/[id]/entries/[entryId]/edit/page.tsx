@@ -27,8 +27,6 @@ export default function EditEntryPage() {
     content: "",
     location: "",
     entry_date: "",
-    mood: "happy",
-    weather: "",
     tags: [],
     image_urls: [],
   });
@@ -57,8 +55,6 @@ export default function EditEntryPage() {
         content: entry.content || "",
         location: entry.location || "",
         entry_date: entry.entry_date,
-        mood: entry.mood || "happy",
-        weather: entry.weather || "",
         tags: entry.tags || [],
         image_urls: entry.image_urls || [],
       });
@@ -294,37 +290,7 @@ export default function EditEntryPage() {
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mood
-                </label>
-                <select
-                  name="mood"
-                  value={formData.mood}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="excited">😃 Excited</option>
-                  <option value="happy">😊 Happy</option>
-                  <option value="neutral">😐 Neutral</option>
-                  <option value="sad">😢 Sad</option>
-                  <option value="stressed">😰 Stressed</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Weather
-                </label>
-                <input
-                  name="weather"
-                  value={formData.weather}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Sunny, rainy, etc."
-                />
-              </div>
-            </div>
+            <div className="mt-4"></div>
           </div>
 
           <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">

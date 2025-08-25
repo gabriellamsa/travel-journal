@@ -12,7 +12,9 @@ export interface Memory {
   location: string;
   date: string;
   imageUrl: string;
-  emoji: string;
+  content?: string;
+  tags?: string[];
+  imageUrls?: string[];
 }
 
 export interface MapPin {

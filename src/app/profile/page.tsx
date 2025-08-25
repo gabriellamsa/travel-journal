@@ -72,13 +72,6 @@ export default function ProfilePage() {
         const entriesArrays = await Promise.all(
           (trips || []).map((t) => getTripEntries(t.id))
         );
-        const moodToEmoji: Record<string, string> = {
-          excited: "😃",
-          happy: "😊",
-          neutral: "😐",
-          sad: "😢",
-          stressed: "😰",
-        };
         const flattened = entriesArrays.flat();
         const mappedMemories: Memory[] = flattened.map((e) => ({
           id: e.id,
@@ -93,7 +86,9 @@ export default function ProfilePage() {
             e.image_urls && e.image_urls.length > 0
               ? e.image_urls[0] // Primeira foto como cover
               : "/about-founder.jpg",
-          emoji: e.mood ? moodToEmoji[e.mood] || "😊" : "😊",
+          content: e.content || "",
+          tags: e.tags || [],
+          imageUrls: e.image_urls || [],
         }));
         setProfileMemories(mappedMemories);
       } catch (err) {
@@ -105,6 +100,28 @@ export default function ProfilePage() {
 
     checkUser();
   }, [router]);
+
+  // Listen for memory updates
+  useEffect(() => {
+    const handleMemoryUpdate = (event: CustomEvent) => {
+      const { memory } = event.detail;
+      setProfileMemories((prev) =>
+        prev.map((m) => (m.id === memory.id ? memory : m))
+      );
+    };
+
+    window.addEventListener(
+      "memoryUpdated",
+      handleMemoryUpdate as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        "memoryUpdated",
+        handleMemoryUpdate as EventListener
+      );
+    };
+  }, []);
 
   if (loading) {
     return (
