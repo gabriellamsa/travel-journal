@@ -3,6 +3,7 @@ export interface Trip {
   title: string;
   locations: string[];
   dates: string;
+  tags?: string[];
 }
 
 export interface Memory {

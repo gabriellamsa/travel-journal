@@ -338,18 +338,18 @@ export default function EditEntryPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Current Photos
                   </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                     {existingImages.map((url, index) => (
                       <div key={`existing-${index}`} className="relative group">
                         <img
                           src={url}
                           alt={`Existing photo ${index + 1}`}
-                          className="w-full h-20 object-cover rounded-lg"
+                          className="w-full h-48 object-cover rounded-lg shadow-sm"
                         />
                         <button
                           type="button"
                           onClick={() => removeExistingImage(index)}
-                          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -395,18 +395,18 @@ export default function EditEntryPage() {
                 </div>
 
                 {selectedFiles.length > 0 && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-3">
                     {selectedFiles.map((file, index) => (
                       <div key={`new-${index}`} className="relative group">
                         <img
                           src={URL.createObjectURL(file)}
                           alt={`New photo ${index + 1}`}
-                          className="w-full h-20 object-cover rounded-lg"
+                          className="w-full h-48 object-cover rounded-lg shadow-sm"
                         />
                         <button
                           type="button"
                           onClick={() => removeFile(index)}
-                          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
                         >
                           <X className="w-3 h-3" />
                         </button>

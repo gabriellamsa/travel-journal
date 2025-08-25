@@ -21,9 +21,9 @@ export async function createTrip(tripData: TripCreate): Promise<Trip> {
       destination: tripData.destination,
       start_date: tripData.start_date,
       end_date: tripData.end_date,
-      is_public: tripData.is_public ?? false,
+      is_public: true, // Always public by default
       cover_image_url: tripData.cover_image_url ?? null,
-      status: tripData.status || "planning",
+      status: tripData.status || "completed",
       tags: tripData.tags ?? null,
       user_id: user.id,
     })

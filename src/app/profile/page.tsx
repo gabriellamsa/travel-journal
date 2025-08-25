@@ -64,6 +64,7 @@ export default function ProfilePage() {
               day: "numeric",
               year: "numeric",
             })}`,
+            tags: t.tags || [],
           }));
         setProfileTrips(mappedTrips);
 

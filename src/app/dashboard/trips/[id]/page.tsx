@@ -366,12 +366,6 @@ export default function TripDetail() {
                     <Calendar className="w-4 h-4" />
                     {formatDate(trip.start_date)} - {formatDate(trip.end_date)}
                   </div>
-                  {trip.budget && (
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="w-4 h-4" />
-                      {trip.budget} {trip.currency}
-                    </div>
-                  )}
                 </div>
 
                 {trip.description && (
@@ -598,18 +592,18 @@ export default function TripDetail() {
                       </div>
 
                       {selectedFiles.length > 0 && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                           {selectedFiles.map((file, index) => (
                             <div key={index} className="relative group">
                               <img
                                 src={URL.createObjectURL(file)}
                                 alt={`Preview ${index + 1}`}
-                                className="w-full h-20 object-cover rounded-lg"
+                                className="w-full h-48 object-cover rounded-lg shadow-sm"
                               />
                               <button
                                 type="button"
                                 onClick={() => removeFile(index)}
-                                className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
                               >
                                 <X className="w-3 h-3" />
                               </button>
@@ -721,13 +715,13 @@ export default function TripDetail() {
 
                     {entry.image_urls && entry.image_urls.length > 0 && (
                       <div className="mb-3">
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                           {entry.image_urls.map((url, index) => (
                             <div key={index} className="relative">
                               <img
                                 src={url}
                                 alt={`Memory photo ${index + 1}`}
-                                className="w-full h-24 object-cover rounded-lg"
+                                className="w-full h-48 object-cover rounded-lg shadow-sm hover:shadow-md transition-shadow"
                               />
                             </div>
                           ))}

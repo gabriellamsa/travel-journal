@@ -182,6 +182,32 @@ const PublicProfile: React.FC<PublicProfileProps> = ({
                       <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
                       {trip.dates}
                     </p>
+                    {trip.tags && trip.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {trip.tags.map((tag, index) => {
+                          const palette = [
+                            { bg: "bg-blue-100", fg: "text-blue-800" },
+                            { bg: "bg-emerald-100", fg: "text-emerald-800" },
+                            { bg: "bg-purple-100", fg: "text-purple-800" },
+                            { bg: "bg-amber-100", fg: "text-amber-800" },
+                            { bg: "bg-rose-100", fg: "text-rose-800" },
+                            { bg: "bg-cyan-100", fg: "text-cyan-800" },
+                          ];
+                          let hash = 0;
+                          for (let i = 0; i < tag.length; i++)
+                            hash = (hash * 31 + tag.charCodeAt(i)) >>> 0;
+                          const color = palette[hash % palette.length];
+                          return (
+                            <span
+                              key={index}
+                              className={`inline-flex items-center px-2 py-1 ${color.bg} ${color.fg} rounded-full text-xs`}
+                            >
+                              {tag}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </a>
               ))}

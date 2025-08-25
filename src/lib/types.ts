@@ -57,7 +57,6 @@ export interface TripCreate {
   destination: string;
   start_date: string;
   end_date: string;
-  is_public?: boolean;
   cover_image_url?: string;
   status?: 'planning' | 'active' | 'completed' | 'cancelled';
   tags?: string[];
@@ -71,7 +70,6 @@ export interface TripUpdate {
   destination?: string;
   start_date?: string;
   end_date?: string;
-  is_public?: boolean;
   cover_image_url?: string;
   status?: 'planning' | 'active' | 'completed' | 'cancelled';
   tags?: string[];

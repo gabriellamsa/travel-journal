@@ -6,7 +6,7 @@ import { createClient } from "@supabase/supabase-js";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { createTrip } from "@/lib/trips";
 import { TripCreate } from "@/lib/types";
-import { MapPin, Calendar, Tag, Eye, EyeOff, Loader2 } from "lucide-react";
+import { MapPin, Calendar, Tag, Loader2 } from "lucide-react";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,7 +22,6 @@ export default function CreateTrip() {
     destination: "",
     start_date: "",
     end_date: "",
-    is_public: true,
     status: "completed",
     tags: [],
     budget: undefined,
@@ -53,10 +52,7 @@ export default function CreateTrip() {
   ) => {
     const { name, value, type } = e.target;
 
-    if (type === "checkbox") {
-      const checked = (e.target as HTMLInputElement).checked;
-      setFormData((prev) => ({ ...prev, [name]: checked }));
-    } else if (type === "number") {
+    if (type === "number") {
       setFormData((prev) => ({
         ...prev,
         [name]: value ? parseFloat(value) : undefined,
@@ -351,44 +347,6 @@ export default function CreateTrip() {
           </div>
 
           {/* Trip Cost removed as requested */}
-
-          {/* Settings */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Settings
-            </h3>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label
-                    htmlFor="is_public"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Make this trip public
-                  </label>
-                  <p className="text-sm text-gray-500">
-                    Public trips can be viewed by anyone
-                  </p>
-                </div>
-                <div className="flex items-center">
-                  {formData.is_public ? (
-                    <Eye className="w-5 h-5 text-blue-600 mr-2" />
-                  ) : (
-                    <EyeOff className="w-5 h-5 text-gray-400 mr-2" />
-                  )}
-                  <input
-                    type="checkbox"
-                    id="is_public"
-                    name="is_public"
-                    checked={formData.is_public}
-                    onChange={handleInputChange}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* Submit Button */}
           <div className="flex justify-end space-x-4">
